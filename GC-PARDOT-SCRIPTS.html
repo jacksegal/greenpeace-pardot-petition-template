@@ -1,0 +1,257 @@
+<script>
+    var PardotFormId = "118663"; //Manually adding the form ID
+    var OC_URL = getUrlVars()["co"];
+    var OneClicker = false;
+    var AutoSend = false;
+    if (document.getElementsByClassName("Constituent_Code")[0].children[0].value == "One-Click Supporter") OneClicker = true;
+    if (OC_URL == "true") OneClicker = true;
+	
+	
+    function getFormattedDate(DD){
+        var d = DD;
+        d = d.getFullYear() + "-" + ('0' + (d.getMonth() + 1)).slice(-2) + "-" + ('0' + d.getDate()).slice(-2) +
+            " " + ('0' + d.getHours()).slice(-2) + ":" + ('0' + d.getMinutes()).slice(-2) + ":" + ('0' + d.getSeconds()).slice(-2);
+        return d;
+    }
+	
+    function RandomString(size) {
+        var text = "";
+        var charset = "abcdefghijklmnopqrstuvwxyz";
+        for (var i = 0; i < size; i++)
+            text += charset.charAt(Math.floor(Math.random() * charset.length));
+        return text;
+    }
+	
+    function AlreadySubmited(FormId) {
+        var SubmittedForms = document.getElementsByClassName("One_Click_Form_Completions")[0].children[0].value;
+        var locat = SubmittedForms.indexOf(FormId);
+        if (locat == -1) return false; else return true;
+    }
+	
+    function RemoveChars(remove) {
+        var returnString = remove.replace(/\||,|;|'|"/gi, '');
+        return returnString;
+    }
+	
+    //Remove the default email required alert for the email.
+    document.getElementsByClassName("email")[0].children[1].setAttribute("onchange", "");
+	
+    function ClearFields() {
+        var inputElements = document.getElementsByTagName("input");
+        for (var i=0; i < inputElements.length; i++) {
+            if (inputElements[i].type == "text"  || inputElements[i].type == "checkbox" || inputElements[i].type == "radio") {
+                if (inputElements[i].type == "text" ) {
+                    inputElements[i].value = "";
+                }
+            }
+        }
+        var textareaElements = document.getElementsByTagName("textarea");
+        for (var i=0; i < textareaElements.length; i++) {
+            textareaElements[i].value = "";
+            //console.log(textareaElements[i].value);
+        }
+        var selectElements = document.getElementsByTagName("select");
+        for (var i=0; i < selectElements.length; i++) {
+            selectElements[i].value = "";
+            //console.log(selectElements[i].options[selectElements[i].selectedIndex].value);
+        }
+    }
+	
+    function getUrlVars() {
+        var vars = {};
+        var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+            function(m,key,value) {
+                vars[key] = value;
+            });
+        return vars;
+    }
+	
+    function FormSubmissionAjax(firstName, theData) {
+        /* Hide the form section*/
+        document.getElementById("FormSection").style.display = "none";
+        //Save your form data to variable theData
+        //AJAX request
+        $.post($('#pardot-form').attr('action'), theData).done(function(data){
+            console.log('Form submitted successfully!');
+            /* If the sumbit request is successful, the text are personalized  */
+            document.getElementById("ThanksFirstShare").innerHTML = "Thanks " + firstName;
+            document.getElementById("ThanksSecondShare").innerHTML = "Thanks " + firstName;
+            document.getElementById("DonateText").innerHTML = firstName + " - Join us in demanding a sustainable economic recovery that works for everyone, and protects                  the planet for the long term.";
+            /* The first thank you is shown  */
+            document.getElementById("FirstShareSection").style.display = "block";
+        }).fail(function(data){
+            /* If the sumbit request fails, is redirected to other page OR clear the form and show it again  */
+            alert("Error submitting the form, redirect to regular form");
+            window.location.replace("https://action.greenpeace.org.uk/l/854853/2020-02-17/g6vc");
+        });
+    }
+	
+	
+	
+    /* This function prevents the auto form submission, we can handle the submission*/
+    $('#pardot-form').submit(function(e){
+        console.log("Begin submission is one clicker = " + OneClicker);
+        e.preventDefault();
+        //Form ID
+        var PardotFormId = "118663";
+        //Approach Code
+        var Approach_Code_JS = "textAC";
+        var AC_URL = getUrlVars()["subsource"];
+        if (AC_URL != undefined) Approach_Code_JS=AC_URL;
+	
+        //Join Campaign
+        if (document.getElementsByClassName("Join_Campaign")[0].children[0].value == "") document.getElementsByClassName("Join_Campaign")[0].children[0].value = Approach_Code_JS;
+	
+        /* These are the fields that are currently required to submit the form  */
+        var email = document.getElementsByClassName("email")[0].children[1].value;
+        var firstName = document.getElementsByClassName("first_name")[0].children[1].value;
+        var lastName = document.getElementsByClassName("last_name")[0].children[1].value;
+        var phone = document.getElementsByClassName("phone")[0].children[1].value;
+        var zip = document.getElementsByClassName("zip")[0].children[1].value;
+        var now = new Date();
+        var timestamp = now.valueOf();
+        PardotFormId = RemoveChars(PardotFormId);
+        Approach_Code_JS = RemoveChars(Approach_Code_JS);
+        firstName = RemoveChars(firstName);
+        lastName = RemoveChars(lastName);
+        email = RemoveChars(email);
+        phone = RemoveChars(phone);
+        zip = RemoveChars(zip);
+	
+        if(OneClicker == false/* || OC_URL == undefined */){
+            // Empty all required fields
+            if (email == '' && firstName == '' ){
+                document.getElementsByClassName("email")[0].children[1].setAttribute("style", "background-color: #f9ff99;");
+                document.getElementsByClassName("first_name")[0].children[1].setAttribute("style", "background-color: #f9ff99;");
+                return;
+            }
+            // Empty email, phone and zip but first name completed
+            if (email == '' && firstName != '' && (phone == '' && zip == '') ){
+                document.getElementsByClassName("email")[0].children[1].setAttribute("style", "background-color: #f9ff99;");
+                document.getElementsByClassName("first_name")[0].children[1].setAttribute("style", "background-color: #ffffff;");
+                return;
+            }
+            // Completed email but empty first name
+            if (email != '' && firstName == ''){
+                document.getElementsByClassName("first_name")[0].children[1].setAttribute("style", "background-color: #f9ff99;");
+                document.getElementsByClassName("email")[0].children[1].setAttribute("style", "background-color: #ffffff;");
+                return;
+            }
+            // Empty email but firstname and phone or zip not empty
+            if (email == '' && firstName != '' && (phone != '' || zip != '' )){
+                document.getElementsByClassName("email")[0].children[1].value = "temp_email_"+timestamp+"_"+RandomString(4)+"@greenpeace.org";
+                var RandomEmail = "temp_email_"+timestamp+"_"+RandomString(4)+"@greenpeace.org";
+                var phoneOptIn = 1;
+                if (phone == '') phoneOptIn = 0;
+                RandomEmail = RemoveChars(RandomEmail);
+                document.getElementsByClassName("Form_Responses")[0].children[0].value =  document.getElementsByClassName("Form_Responses")[0].children[0].value +
+                    "form_id=" + PardotFormId +"|" + "approach_code=" +Approach_Code_JS +"|email_opt_in=0|phone_opt_in="+phoneOptIn+"|created_date=" + getFormattedDate( new Date(new Date().toLocaleString("en-US", {timeZone: "UTC"})))+
+                    "|" + "first_name=" +firstName + "|" + "last_name=" +lastName + "|" + "email=" +RandomEmail + "|" + "phone=" + phone + "|" + "postcode=" +zip + ";";
+	
+                var theData = $(this).serialize();
+                FormSubmissionAjax(firstName,theData);
+                return;
+            }
+            // Email and first name completed
+            if (email != '' && firstName != ''){
+                var phoneOptIn = 1;
+                if (phone == '') phoneOptIn = 0;
+                document.getElementsByClassName("Form_Responses")[0].children[0].value =  document.getElementsByClassName("Form_Responses")[0].children[0].value +
+                    "form_id=" + PardotFormId +"|" + "approach_code=" +Approach_Code_JS +"|email_opt_in=1|phone_opt_in="+phoneOptIn+"|created_date=" + getFormattedDate( new Date(new Date().toLocaleString("en-US", {timeZone: "UTC"})))+
+                    "|" + "first_name=" +firstName + "|" + "last_name=" +lastName + "|" + "email=" +email + "|" + "phone=" + phone + "|" + "postcode=" +zip + ";";
+	
+                var theData = $(this).serialize();
+                FormSubmissionAjax(firstName,theData);
+                return;
+            }
+        }else{ // Is a one clicker, but already submitted the form so, its treated like a regular giver
+            // Email and first name completed
+            if (email == '' && firstName == '' ){
+                document.getElementsByClassName("email")[0].children[1].setAttribute("style", "background-color: #f9ff99;");
+                document.getElementsByClassName("first_name")[0].children[1].setAttribute("style", "background-color: #f9ff99;");
+                return;
+            }
+            if (email != '' && firstName != ''){
+                document.getElementsByClassName("One_Click_Form_Completions")[0].children[0].value = document.getElementsByClassName("One_Click_Form_Completions")[0].children[0].value + "-" + PardotFormId;
+                console.log(document.getElementsByClassName("One_Click_Form_Completions")[0].children[0].value);
+                var emailOptIn = 1;
+                if (AutoSend == true) emailOptIn = 0;
+                document.getElementsByClassName("Form_Responses")[0].children[0].value =  document.getElementsByClassName("Form_Responses")[0].children[0].value +
+                    "form_id=" + PardotFormId +"|" + "approach_code=" +Approach_Code_JS +"|email_opt_in="+emailOptIn+"|phone_opt_in=0|created_date=" + getFormattedDate( new Date(new Date().toLocaleString("en-US", {timeZone: "UTC"})))+
+                    "|" + "first_name=" +firstName + "|" + "last_name=" +lastName + "|" + "email=" +email + "|" + "phone=" + phone + "|" + "postcode=" +zip + ";";
+	
+                var theData = $(this).serialize();
+                FormSubmissionAjax(firstName,theData);
+                return;
+            }
+	
+        }
+    });
+	
+	
+	
+    //Check if its a one clicker
+    if(OneClicker == true /*|| OC_URL == "true" */){
+        /* These are the fields that are currently required to submit the form  */
+        var email = document.getElementsByClassName("email")[0].children[1].value;
+        var firstName = document.getElementsByClassName("first_name")[0].children[1].value;
+        var lastName = document.getElementsByClassName("last_name")[0].children[1].value;
+        var alreadySubmittedForm = AlreadySubmited(PardotFormId);
+        // Check if this form has been already submitted by a one click
+        if (alreadySubmittedForm){
+            console.log("Is already submitted? " + alreadySubmittedForm  );
+            ClearFields();
+            document.getElementById("FormSection").style.display = "block";
+            // If the form has been submitted already
+        }else{
+            /* If they are not empty, the form is submitted automatically. IMPORTANT Here's where the required fields are set up. IMPORTANT */
+            if (email != "" && firstName != "" && lastName != "" ){
+                AutoSend = true;
+                $('#pardot-form :submit').click();
+            }else{
+                /* If they are empty, all the form fields are cleared and then the form is shown  */
+                ClearFields();
+                document.getElementById("FormSection").style.display = "block";
+            }
+        }
+    }
+    else{ //Clear the fields for an optional email prospect
+        ClearFields();
+    }
+	
+	
+	
+	
+	
+	
+	
+    /* Here goes the actions of every button that is show after the form submission */
+	
+    document.getElementById("FirstShareSection").getElementsByTagName("button")[0].onclick = function(){
+        alert("Yes, share with friends (redirect to external site or other action)");
+        document.getElementById("FirstShareSection").style.display = "none";
+        document.getElementById("SecondShareSection").style.display = "block";
+    };
+	
+    document.getElementById("FirstShareSection").getElementsByTagName("button")[1].onclick = function(){
+        document.getElementById("FirstShareSection").style.display = "none";
+        document.getElementById("SecondShareSection").style.display = "block";
+    };
+	
+    document.getElementById("SecondShareSection").getElementsByTagName("button")[0].onclick = function(){
+        alert("Yes, share share the word (redirect to external site or other action)");
+        document.getElementById("SecondShareSection").style.display = "none";
+        document.getElementById("DonateSection").style.display = "block";
+    };
+	
+    document.getElementById("SecondShareSection").getElementsByTagName("button")[1].onclick = function(){
+        document.getElementById("SecondShareSection").style.display = "none";
+        document.getElementById("DonateSection").style.display = "block";
+    };
+	
+    document.getElementById("SecondShareSection").getElementsByTagName("button")[2].onclick = function(){
+        document.getElementById("SecondShareSection").style.display = "none";
+        document.getElementById("DonateSection").style.display = "block";
+    };
+
+</script>
