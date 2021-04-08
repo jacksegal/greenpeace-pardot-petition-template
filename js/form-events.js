@@ -40,7 +40,7 @@ FormEvents = {
         });
     },
     skipClick: function () {
-        $('.skip-button').click(function(e) {
+        $('[data-skip-ask="true"]').click(function(e) {
             ProgressSteps.crossShare();
 
             // Dispatch Event
