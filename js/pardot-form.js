@@ -76,7 +76,7 @@ PardotForm = {
             return this.getUrlVars()['subsource'];
         }
 
-        // Fallback to Form default
+        // Fallback to page default
         if(PageOptions.defaultApproachCode && PageOptions.defaultApproachCode != '') {
             return PageOptions.defaultApproachCode;
         }
@@ -102,11 +102,17 @@ PardotForm = {
         $('[data-scroll-to="#donate-monthly-section"]').attr('data-scroll-to', '#donate-single-section');
     },
     constructFormFields: function() {
+        $("#pardot-form").hide();
+        this.populateEmailAddress();
         this.populateJoinCampaign();
         this.populateFormResponse();
         if(OneClick.isOneClick()) {
             this.populateOneClickFormCompletions();
         }
+    },
+    populateEmailAddress: function() {
+        var email = document.querySelector(".email input");
+        email.value = this.getEmailAddress();
     },
     populateFormResponse: function() {
         var formResponse = document.querySelector(".Form_Responses input");
@@ -119,8 +125,8 @@ PardotForm = {
                 {name: 'last_name', value: document.querySelector(".last_name input").value || ''},
                 {name: 'email', value: this.getEmailAddress()},
                 {name: 'phone', value: document.querySelector(".phone input").value || ''},
-                {name: 'email_opt_in', value: this.getEmailOptIn()},
-                {name: 'phone_opt_in', value: this.getPhoneOptIn()},
+                {name: 'email_opt_in', value: OneClick.isOneClick() ? '0' : this.getEmailOptIn()},
+                {name: 'phone_opt_in', value: OneClick.isOneClick() ? '0' : this.getPhoneOptIn()},
                 {name: 'postcode', value: document.querySelector(".zip input").value || ''},
                 {name: 'created_date', value: moment().format('YYYY-MM-DD HH:mm:ss')},
             ];
@@ -279,7 +285,7 @@ OneClick = {
         var submittedForms = document.querySelector(".One_Click_Form_Completions input");
 
         if(submittedForms && submittedForms.value) {
-            var FormId = this.getFormId();
+            var FormId = PardotForm.getFormId();
             var locat = submittedForms.value.indexOf(FormId);
 
             if (locat == -1) {
@@ -288,7 +294,7 @@ OneClick = {
                 return false;
             }
         } else {
-            return false;
+            return true;
         }
     }
 };
@@ -364,17 +370,20 @@ FormSubmit = {
 };
 
 PetitionCounter = {
-    init: function(campaign) {
+    init: function(campaigns, offset) {
         // var counterBaseUrl = 'https://uat-gpuk.cs127.force.com/pc/services/apexrest/campaign/petitioncounter/';
         var counterBaseUrl = 'https://gpuk.secure.force.com/pc/services/apexrest/campaign/petitioncounter/';
         var that = this;
         $.ajax({
             type: "GET",
-            url: counterBaseUrl + campaign,
+            url: counterBaseUrl + campaigns,
             dataType: "json",
             success: function(response) {
                 if (response.petitionCounter && Number.isInteger(response.petitionCounter)) {
                     var count = response.petitionCounter;
+                    if(offset && Number.isInteger(offset)){
+                        count += offset;
+                    }
                     var target = that.getCounterTarget(count);
                     if(count > 1000) {
                         that.updateCounterText(count, target);
