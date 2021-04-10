@@ -301,24 +301,35 @@ OneClick = {
 
 FormSubmit = {
     submitAjax: function(form) {
-        $.post($(form).attr('action'), $(form).serialize()).done(function(data){
-            FormSubmit.onSuccess();
 
-            console.group("%cForm Submission", "color: #241C15; background-color: #FF00F0; padding: 4px; font-weight: 400;");
-            console.log("Status:\t","Success");
-            console.log("Data:\t",data);
-            console.log(data);
-            console.groupEnd();
-        }).fail(function(data){
-            FormSubmit.onError();
+        $.ajax({
+            method: "POST",
+            url: $(form).attr('action'),
+            data: $(form).serialize(),
+            beforeSend: function() {
+                FormSubmit.onSubmit();
+            },
+            success: function() {
+                FormSubmit.onSuccess();
 
-            console.group("%cForm Submission", "color: #241C15; background-color: #FE576F; padding: 4px; font-weight: 400;");
-            console.log("Status:\t","Fail");
-            console.log("Data:\t",data);
-            console.groupEnd();
+                console.group("%cForm Submission", "color: #241C15; background-color: #FF00F0; padding: 4px; font-weight: 400;");
+                console.log("Status:\t","Success");
+                console.log("Data:\t",data);
+                console.log(data);
+                console.groupEnd();
+            },
+            error: function() {
+                FormSubmit.onError();
+
+                console.group("%cForm Submission", "color: #241C15; background-color: #FE576F; padding: 4px; font-weight: 400;");
+                console.log("Status:\t","Fail");
+                console.log("Data:\t",data);
+                console.groupEnd();
+            },
+
         });
     },
-    onSuccess: function() {
+    onSubmit: function() {
         // Show firstname
         var firstname = document.querySelector(".first_name input");
         if(firstname && firstname.value != '') {
@@ -336,7 +347,8 @@ FormSubmit = {
 
         // Progress Steps
         $(".progress-container-div").fadeIn();
-
+    },
+    onSuccess: function() {
         // Dispatch Event
         var event = new CustomEvent('petitionSuccess');
         document.dispatchEvent(event);

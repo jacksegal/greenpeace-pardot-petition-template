@@ -41,19 +41,21 @@
 	</div>
 	%%form-end-loop-fields%%
 
+	<p class="required-msg">* Required</p>
+
 	%%form-spam-trap-field%%
 
 	<!-- forces IE5-8 to correctly submit UTF8 content  -->
 	<input name="_utf8" type="hidden" value="&#9731;" />
 
+	<div class="pardot-after-form-content-container">
+		%%form-after-form-content%%
+	</div>
+
 	<div class="submit-button-container">
 		<button type="submit" accesskey="s" class="btn btn-gp btn-lg btn-block" value="%%form-submit-button-text%%">%%form-submit-button-text%%</button>
 	</div>
 
-
-	<div class="pardot-after-form-content-container">
-		%%form-after-form-content%%
-	</div>
 
 	%%form-end-if-display-form%%
 
