@@ -309,16 +309,16 @@ FormSubmit = {
             beforeSend: function() {
                 FormSubmit.onSubmit();
             },
-            success: function() {
+            success: function(data) {
                 FormSubmit.onSuccess();
 
                 console.group("%cForm Submission", "color: #241C15; background-color: #FF00F0; padding: 4px; font-weight: 400;");
                 console.log("Status:\t","Success");
-                console.log("Data:\t",data);
+                // console.log("Data:\t",data);
                 console.log(data);
                 console.groupEnd();
             },
-            error: function() {
+            error: function(data) {
                 FormSubmit.onError();
 
                 console.group("%cForm Submission", "color: #241C15; background-color: #FE576F; padding: 4px; font-weight: 400;");
