@@ -25,12 +25,12 @@ FormEvents = {
     shareClick: function () {
         $('[data-share-button]').click(function(e) {
             /* Open Link in New Tab */
-            e.preventDefault();
-            if( $(this).attr('data-share-medium') === 'email' ) {
-                location.href = $(this).attr('href');
-            } else {
-                window.open($(this).attr('href'), 'shareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
-            }
+            // e.preventDefault();
+            // if( $(this).attr('data-share-medium') === 'email' ) {
+            //     location.href = $(this).attr('href');
+            // } else {
+            //     window.open($(this).attr('href'), 'shareWindow', 'height=450, width=550, top=' + ($(window).height() / 2 - 275) + ', left=' + ($(window).width() / 2 - 225) + ', toolbar=0, location=0, menubar=0, directories=0, scrollbars=0');
+            // }
 
             ProgressSteps.tickShare();
 
@@ -49,7 +49,7 @@ FormEvents = {
         });
     },
     askClick: function() {
-        $('[data-ask-button="true"]').click(function(e) {
+        $('[data-ask-answer]').click(function(e) {
             if(this.getAttribute('data-ask-answer') == 'no' ) {
                 ProgressSteps.crossShare();
             }

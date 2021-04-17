@@ -195,14 +195,23 @@ PardotForm = {
             .replace(',','');
     },
     getEmailOptIn: function() {
-        if(document.querySelector(".email input") && document.querySelector(".email input").value != '') {
+        if(
+            document.querySelector(".email input")
+            && document.querySelector(".email input").value != ''
+            && !(document.querySelector(".email input").value.includes('temp_email_'))
+            && !(OneClick.isOneClick())
+        ) {
             return '1';
         } else {
             return '0';
         }
     },
     getPhoneOptIn: function() {
-        if(document.querySelector(".phone input") && document.querySelector(".phone input").value != '') {
+        if(
+            document.querySelector(".phone input")
+            && document.querySelector(".phone input").value != ''
+            && !(OneClick.isOneClick())
+        ) {
             return '1';
         } else {
             return '0';
